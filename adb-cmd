@@ -1,0 +1,4 @@
+cd data/local/tmp
+chmod 777 kallsymsprint
+./kallsymsprint kernel > kallsyms
+exit
