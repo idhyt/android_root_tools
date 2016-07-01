@@ -25,6 +25,8 @@ adb shell chmod 777 /data/local/tmp/kallsymsprint
 
 adb shell /data/local/tmp/kallsymsprint /data/local/tmp/kernel > kallsyms
 
+python kparse.py -f kallsyms
+
 rem adb pull data/local/tmp/kallsyms kallsyms
 
 rem del kernel
