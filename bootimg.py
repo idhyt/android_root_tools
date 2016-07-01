@@ -1025,7 +1025,6 @@ def repack_bootimg(kernel_addr=None, ramdisk_addr=None, second_addr=None, tags_a
 
 
 def unpack_bootimg_fix():
-    print "*** unpack_bootimg_fix ***"
 
     cur_dir = os.path.split(os.path.realpath(__file__))[0]
     os.chdir(cur_dir)
@@ -1045,8 +1044,8 @@ def unpack_bootimg_fix():
             value += ord(c) << (i * 8)
 
         # print "0x%x = 0x%x" % (offset, value)
-
-        if value == 0x00088b1f and offset % 4 != 0:
+        # offset % 4 == 0 and offset == 0x200 -> gionee
+        if value == 0x00088b1f and (offset % 4 != 0 or offset == 0x200):
             print "kernel need fix"
             fix = True
             break
@@ -1054,11 +1053,13 @@ def unpack_bootimg_fix():
         value = 0
 
     if fix:
+        print "*** unpack_bootimg_fix ***"
         f_1.seek(offset)
         with open("kernel.gz", "wb") as f_2:
             f_2.write(f_1.read())
             f_2.close()
             f_1.close()
+        print "*** unpack_bootimg_fix end ***"
 
         # os.remove("kernel")
 

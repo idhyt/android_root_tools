@@ -8,19 +8,24 @@ if exist bootimg.json del bootimg.json
 if exist unknown del unknown
 if exist dt.img del dt.img
 
-if exist kernel del kernel
-
-7z.exe x -tgzip kernel.gz -y
+if exist kernel.gz 7z.exe x -tgzip kernel.gz -y
 
 if exist kernel.gz del kernel.gz
 
-adb push kernel data/local/tmp
-adb push kallsymsprint_arm32 data/local/tmp/kallsymsprint
-rem adb push kallsymsprint_arm64 data/local/tmp/kallsymsprint
+if exist kernel (
+    adb push kernel data/local/tmp
+    ) else (
+    echo "can not find kernel"
+    pause
+    exit)
+rem adb push kallsymsprint_arm32 data/local/tmp/kallsymsprint
+adb push kallsymsprint_arm64 data/local/tmp/kallsymsprint
 
-adb shell < adb-cmd
+adb shell chmod 777 /data/local/tmp/kallsymsprint
 
-adb pull data/local/tmp/kallsyms kallsyms
+adb shell /data/local/tmp/kallsymsprint /data/local/tmp/kernel > kallsyms
+
+rem adb pull data/local/tmp/kallsyms kallsyms
 
 rem del kernel
 
