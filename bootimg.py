@@ -5,7 +5,7 @@
 @date:
 @description:
     Modify from https://github.com/liudongmiao/bootimg
-    fix some unpack type
+    fix some unpack type and update unpack_bootimg
 """
 
 import os
@@ -223,7 +223,7 @@ POSITION = {0x30000000: 'boot.img',
 
 
 def parse_updata(updata, debug=False):
-    ''' parse C8600 UPDATA binary.
+    """ parse C8600 UPDATA binary.
         if debug is true or 1 or yes, write content to [position], else according POSITION
 
         UPDATA.APP Structure (only guess)
@@ -242,7 +242,7 @@ def parse_updata(updata, debug=False):
         header                  |       crc-ccitt for every 4096 of content
         content                 |
         padding                 |       padding to 4 bytes
-    '''
+    """
 
     updatalist = open('updatalist.txt', 'w')
     while True:
@@ -308,7 +308,7 @@ def parse_updata(updata, debug=False):
 
 
 def write_updata(output):
-    '''
+    """
         magic                   |       0x55 0xaa 0x5a 0xa5
         header_length           |       unsigned int
         tag1                    |       0x01 0x00 0x00 0x00
@@ -324,7 +324,7 @@ def write_updata(output):
         header                  |       crc-ccitt for every 4096 of content
         content                 |
         padding                 |       padding to 4 bytes
-    '''
+    """
     from time import strftime
 
     output.write(struct.pack('1s', latin('')) * 92)
@@ -380,12 +380,12 @@ def write_updata(output):
 
 
 def cpio_list(directory, output=None):
-    ''' generate gen_cpio_init-compatible list for directory,
+    """ generate gen_cpio_init-compatible list for directory,
         if output is None, write to stdout
 
         official document:
         http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=usr/gen_init_cpio.c
-    '''
+    """
 
     if not hasattr(output, 'write'):
         output = sys.stdout
@@ -414,14 +414,14 @@ def cpio_list(directory, output=None):
 
 
 def parse_cpio(cpio, directory, cpiolist):
-    ''' parse cpio, write content under directory.
+    """ parse cpio, write content under directory.
         cpio: file object
         directory: string
         cpiolist: file object
 
         official document: (cpio newc structure)
         http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=usr/gen_init_cpio.c
-    '''
+    """
 
     padding = lambda x: (~x + 1) & 3
 
@@ -486,10 +486,10 @@ def parse_cpio(cpio, directory, cpiolist):
 
 
 def write_cpio(cpiolist, output):
-    ''' generate cpio from cpiolist.
+    """ generate cpio from cpiolist.
         cpiolist: file object
         output: file object
-    '''
+    """
 
     padding = lambda x, y: struct.pack('%ds' % ((~x + 1) & (y - 1)), '')
 
@@ -587,13 +587,13 @@ def write_cpio(cpiolist, output):
 
 
 def parse_yaffs2(image, directory):
-    ''' parse yaffs2 image.
+    """ parse yaffs2 image.
 
         official document: (utils/mkyaffs2image)
         https://android.googlesource.com/platform/external/yaffs2/+/master/yaffs2/
         spare: yaffs_PackedTags2 in yaffs_packedtags2.h
         chunk: yaffs_ExtendedTags in yaffs_guts.h
-    '''
+    """
 
     path = '.'
     filelist = {1: '.'}
@@ -698,11 +698,11 @@ class CPIOGZIP(GzipFile):
 
 
 def parse_rle(rle, raw):
-    ''' convert 565-rle format to raw file.
+    """ convert 565-rle format to raw file.
 
         official document:
         https://android.googlesource.com/platform/build/+/master/tools/rgb2565/to565.c
-    '''
+    """
     r = lambda x: int(((x >> 11) & 0x1f) << 3)
     g = lambda x: int(((x >> 5) & 0x3f) << 2)
     b = lambda x: int((x & 0x1f) << 3)
@@ -724,11 +724,11 @@ def parse_rle(rle, raw):
 
 
 def parse_565(rle, raw):
-    ''' convert 565 format to raw file.
+    """ convert 565 format to raw file.
 
         official document:
         https://android.googlesource.com/platform/build/+/master/tools/rgb2565/to565.c
-    '''
+    """
     r = lambda x: int(((x >> 11) & 0x1f) << 3)
     g = lambda x: int(((x >> 5) & 0x3f) << 2)
     b = lambda x: int((x & 0x1f) << 3)
@@ -748,8 +748,8 @@ def parse_565(rle, raw):
 
 
 def write_rle(raw, rle):
-    ''' convert raw file to 565-rle format.
-    '''
+    """ convert raw file to 565-rle format.
+    """
     x = lambda r, g, b: ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
 
     last = None
@@ -778,8 +778,8 @@ def write_rle(raw, rle):
 
 
 def write_565(raw, rle):
-    ''' convert raw file to 565 format.
-    '''
+    """ convert raw file to 565 format.
+    """
     x = lambda r, g, b: ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
 
     last = None
@@ -798,11 +798,11 @@ def write_565(raw, rle):
 
 
 def unpack_simg(simg=None, img=None):
-    '''unpack sparse image
+    """unpack sparse image
 
     official document:
     https://android.googlesource.com/platform/system/core/+/master/libsparse/
-    '''
+    """
     sys.stderr.write('arguments: [sparse image] [raw image]\n')
     sys.stderr.write('simg file: %s\n' % simg)
     sys.stderr.write(' img file: %s\n' % img)
@@ -1024,44 +1024,68 @@ def repack_bootimg(kernel_addr=None, ramdisk_addr=None, second_addr=None, tags_a
     write_bootimg(**options)
 
 
-def unpack_bootimg_fix():
+def unpack_bootimg_update():
+    print "[+] unpack_bootimg_fix"
 
     cur_dir = os.path.split(os.path.realpath(__file__))[0]
     os.chdir(cur_dir)
 
+    if os.path.exists("kernel.gz") and not os.path.exists("kernel"):
+        os.rename("kernel.gz", "kernel")
+
+    del_file_name = [
+        "bootimg.json",
+        "ramdisk",
+        "ramdisk.gz",
+        "unknown",
+        "dt.img",
+    ]
+    for file_name in del_file_name:
+        if os.path.exists(file_name):
+            os.remove(file_name)
+
     if not os.path.exists("kernel"):
-        print "not kernel file!"
+        print "[-] not kernel file!"
         return
 
-    fix = False
-    offset = 0
-    value = 0
-    f_1 = open("kernel", "rb")
-    for offset in xrange(0x5000):
-        f_1.seek(offset)
-        for i in xrange(4):
-            c = f_1.read(1)
-            value += ord(c) << (i * 8)
+    import re
+    import subprocess
 
-        # print "0x%x = 0x%x" % (offset, value)
-        # offset % 4 == 0 and offset == 0x200 -> gionee
-        if value == 0x00088b1f and (offset % 4 != 0 or offset == 0x200):
-            print "kernel need fix"
-            fix = True
+    version = r"Linux\sversion\s\d+.\d+.\d+.*(\#.*\d+:\d+:\d+\s.*\s[\d+]{4})"
+    gz_tag = struct.pack('4B', 0x1f, 0x8b, 0x08, 0x00)
+    gz_command = "7z.exe x -tgzip kernel.gz -y"
+
+    while os.path.exists("kernel"):
+        f_r = open("kernel", "rb")
+        all_kernel_content = f_r.read()
+        f_r.close()
+
+        v_regex = re.search(version, all_kernel_content)
+        if v_regex:
+            kernel_version = v_regex.group(0)
+            print "[+] fix kernel success!"
+            print kernel_version
             break
+        else:
+            zip_tag_off = all_kernel_content.find(gz_tag)
+            if zip_tag_off < 0:
+                print "[-] fix kernel false!"
+                return
 
-        value = 0
+            f_w = open("kernel.gz", "wb")
+            f_w.write(all_kernel_content[zip_tag_off:])
+            f_w.close()
 
-    if fix:
-        print "*** unpack_bootimg_fix ***"
-        f_1.seek(offset)
-        with open("kernel.gz", "wb") as f_2:
-            f_2.write(f_1.read())
-            f_2.close()
-            f_1.close()
-        print "*** unpack_bootimg_fix end ***"
+            p = subprocess.Popen(gz_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in p.stdout.readlines():
+                print line
+            p.wait()
 
-        # os.remove("kernel")
+            if os.path.exists("kernel") and os.path.exists("kernel.gz"):
+                os.remove("kernel.gz")
+            else:
+                print "[-] compressed error!"
+            continue
 
 
 def unpack_bootimg(bootimg=None):
@@ -1071,7 +1095,7 @@ def unpack_bootimg(bootimg=None):
     sys.stderr.write('bootimg file: %s\n' % bootimg)
     sys.stderr.write('output: kernel[.gz] ramdisk[.gz] second[.gz]\n')
     parse_bootimg(open(bootimg, 'rb'))
-    unpack_bootimg_fix()
+    unpack_bootimg_update()
 
 
 def unpack_updata(updata=None, debug=False):
