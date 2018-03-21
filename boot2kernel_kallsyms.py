@@ -18,7 +18,17 @@ KALLSYMS = "kallsyms"
 
 
 def main():
-    cmd = "./getkernel boot.img"
+    if len(sys.argv) > 1:
+        bootimg = sys.argv[1]
+    else:
+        bootimg = "boot.img"
+
+    if not os.path.exists(bootimg):
+        print("[-] %s not exist!\n" % bootimg)
+        sys.exit(-1)
+
+    cmd = "./getkernel %s" % bootimg
+    print("[!] %s\n" % cmd)
     os.system(cmd)
     if not os.path.exists(KERNEL):
         print("[-] get kernel false!\n")
