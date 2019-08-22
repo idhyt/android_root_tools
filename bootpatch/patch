@@ -1,0 +1,16 @@
+#!/system/bin/sh
+# init.rc: 750; fstab: 640; test_script.sh: 755; sepolicy: 644
+
+tmpdir=/data/local/tmp/bootpatch
+
+cd $tmpdir
+
+./magiskboot --unpack boot.img
+./magiskboot --cpio ramdisk.cpio "add 750 init.test.rc init.test.rc"
+./magiskboot --cpio ramdisk.cpio "add 755 test_script.sh test_script.sh"
+./magiskboot --cpio ramdisk.cpio "extract init.rc patch_init.rc"
+sed -i "1i\import /init.test.rc\n" patch_init.rc
+./magiskboot --cpio ramdisk.cpio "add 750 init.rc patch_init.rc"
+./magiskboot --cpio ramdisk.cpio "add 644 sepolicy sepolicy"
+./magiskboot --cpio ramdisk.cpio "rm verity_key"
+./magiskboot --repack boot.img

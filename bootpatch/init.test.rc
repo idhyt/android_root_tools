@@ -1,0 +1,8 @@
+# test script
+# magisk: seclabel u:r:su:s0
+# supersu: seclabel u:r:init:s0
+service test /test_script.sh
+    class late_start
+    user root
+    seclabel u:r:su:s0
+    oneshot
