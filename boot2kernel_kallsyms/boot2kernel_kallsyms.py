@@ -27,7 +27,7 @@ def main():
         print("[-] %s not exist!\n" % bootimg)
         sys.exit(-1)
 
-    cmd = "./getkernel %s" % bootimg
+    cmd = "./getkernel/getkernel %s" % bootimg
     print("[!] %s\n" % cmd)
     os.system(cmd)
     if not os.path.exists(KERNEL):
